@@ -1,77 +1,207 @@
-<!-- frontend/index.html -->
 <!DOCTYPE html>
 <html lang="th">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>สร้าง QR Code</title>
+  <title>สร้าง QR Code ฟรี • ปรับแต่งได้</title>
+  <!-- ใช้ Google Fonts สำหรับภาษาไทย -->
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600&display=swap" rel="stylesheet">
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
       font-family: 'Sarabun', sans-serif;
-      text-align: center;
-      padding: 40px;
-      background: #f5f7fa;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4edf9 100%);
+      min-height: 100vh;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
-    input {
-      width: 90%;
-      max-width: 500px;
+
+    .container {
+      width: 100%;
+      max-width: 600px;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+      padding: 32px;
+      margin-top: 30px;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 600;
+      color: #1976d2;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #555;
+      margin-bottom: 24px;
+      font-size: 16px;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      outline: none;
+      transition: border 0.3s;
+    }
+
+    input[type="text"]:focus {
+      border-color: #1976d2;
+      box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.15);
+    }
+
+    .color-row {
+      display: flex;
+      gap: 20px;
+      margin-top: 10px;
+    }
+
+    .color-item {
+      flex: 1;
+    }
+
+    input[type="color"] {
+      width: 100%;
+      height: 48px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    button {
+      width: 100%;
       padding: 14px;
       font-size: 18px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      margin: 10px 0;
-    }
-    button {
-      padding: 12px 24px;
-      font-size: 18px;
+      font-weight: 600;
       background: #1976d2;
       color: white;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       cursor: pointer;
+      transition: background 0.3s;
     }
-    button:hover { background: #1565c0; }
-    #qr { margin-top: 20px; max-width: 300px; }
+
+    button:hover {
+      background: #1565c0;
+    }
+
+    #result {
+      margin-top: 24px;
+      text-align: center;
+    }
+
+    #qr {
+      max-width: 250px;
+      margin: 16px auto;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .download-btn {
+      background: #4caf50;
+      margin-top: 12px;
+    }
+
+    .download-btn:hover {
+      background: #43a047;
+    }
+
+    footer {
+      margin-top: 30px;
+      color: #888;
+      font-size: 14px;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
-  <h1>📱 สร้าง QR Code ฟรี</h1>
-  <p>พิมพ์ลิงก์หรือข้อความ → ระบบจะสร้าง QR Code ให้ทันที!</p>
-  
-  <input type="text" id="text" placeholder="เช่น https://www.example.com หรือ สวัสดีครับ" />
-  <br>
-  <button onclick="generateQR()">สร้าง QR Code</button>
+  <div class="container">
+    <h1>📱 สร้าง QR Code ฟรี</h1>
+    <p class="subtitle">พิมพ์ลิงก์หรือข้อความ → ปรับแต่งสี → ดาวน์โหลดทันที!</p>
 
-  <div id="result"></div>
+    <div class="input-group">
+      <label for="text">ข้อความหรือลิงก์</label>
+      <input type="text" id="text" placeholder="เช่น https://www.example.com หรือ ฝากซื้อเหรียญ 10 บาท 5 เหรียญ" />
+    </div>
+
+    <div class="input-group">
+      <label>ปรับแต่งสี</label>
+      <div class="color-row">
+        <div class="color-item">
+          <label for="fg-color">สี QR</label>
+          <input type="color" id="fg-color" value="#000000">
+        </div>
+        <div class="color-item">
+          <label for="bg-color">สีพื้นหลัง</label>
+          <input type="color" id="bg-color" value="#ffffff">
+        </div>
+      </div>
+    </div>
+
+    <button onclick="generateQR()">สร้าง QR Code</button>
+
+    <div id="result"></div>
+  </div>
+
+  <footer>
+    © 2025 • สร้างด้วย Python + Flask + HTML
+  </footer>
 
   <script>
     async function generateQR() {
       const text = document.getElementById('text').value.trim();
+      const fg = document.getElementById('fg-color').value;
+      const bg = document.getElementById('bg-color').value;
+
       if (!text) {
-        alert('กรุณากรอกข้อความก่อนครับ!');
+        alert('กรุณากรอกข้อความหรือลิงก์ก่อนครับ!');
         return;
       }
 
-  
-      const BACKEND_URL = 'https://qrcode-backend-2xh4.onrender.com';
+      // 🔥 อย่าลืมเปลี่ยนเป็นลิงก์ของคุณ!
+      const BACKEND_URL = 'https://qrcode-backend-2xh4.onrender.com/generate';
 
       try {
         const res = await fetch(BACKEND_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text: text })
+          body: JSON.stringify({ text, fg, bg })
         });
 
         if (res.ok) {
           const blob = await res.blob();
           const url = URL.createObjectURL(blob);
           document.getElementById('result').innerHTML = `
-            <h3>สแกนเลย!</h3>
+            <h3 style="margin: 16px 0; color: #1976d2;">สแกนเลย!</h3>
             <img id="qr" src="${url}" alt="QR Code">
-            <br><br>
-            <a href="${url}" download="qrcode.png">
-              <button>⬇️ ดาวน์โหลด QR Code</button>
-            </a>
+            <br>
+            <button class="download-btn" onclick="downloadQR('${url}')">
+              ⬇️ ดาวน์โหลด QR Code
+            </button>
           `;
         } else {
           const err = await res.json();
@@ -80,6 +210,15 @@
       } catch (e) {
         alert('เกิดข้อผิดพลาด: ' + e.message);
       }
+    }
+
+    function downloadQR(url) {
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'qrcode.png';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
     }
   </script>
 </body>
