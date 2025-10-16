@@ -1,0 +1,86 @@
+<!-- frontend/index.html -->
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>สร้าง QR Code</title>
+  <style>
+    body {
+      font-family: 'Sarabun', sans-serif;
+      text-align: center;
+      padding: 40px;
+      background: #f5f7fa;
+    }
+    input {
+      width: 90%;
+      max-width: 500px;
+      padding: 14px;
+      font-size: 18px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin: 10px 0;
+    }
+    button {
+      padding: 12px 24px;
+      font-size: 18px;
+      background: #1976d2;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button:hover { background: #1565c0; }
+    #qr { margin-top: 20px; max-width: 300px; }
+  </style>
+</head>
+<body>
+  <h1>📱 สร้าง QR Code ฟรี</h1>
+  <p>พิมพ์ลิงก์หรือข้อความ → ระบบจะสร้าง QR Code ให้ทันที!</p>
+  
+  <input type="text" id="text" placeholder="เช่น https://www.example.com หรือ สวัสดีครับ" />
+  <br>
+  <button onclick="generateQR()">สร้าง QR Code</button>
+
+  <div id="result"></div>
+
+  <script>
+    async function generateQR() {
+      const text = document.getElementById('text').value.trim();
+      if (!text) {
+        alert('กรุณากรอกข้อความก่อนครับ!');
+        return;
+      }
+
+  
+      const BACKEND_URL = 'https://qrcode-backend-2xh4.onrender.com';
+
+      try {
+        const res = await fetch(BACKEND_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: text })
+        });
+
+        if (res.ok) {
+          const blob = await res.blob();
+          const url = URL.createObjectURL(blob);
+          document.getElementById('result').innerHTML = `
+            <h3>สแกนเลย!</h3>
+            <img id="qr" src="${url}" alt="QR Code">
+            <br><br>
+            <a href="${url}" download="qrcode.png">
+              <button>⬇️ ดาวน์โหลด QR Code</button>
+            </a>
+          `;
+        } else {
+          const err = await res.json();
+          alert('❌ ' + (err.error || 'ไม่สามารถสร้าง QR ได้'));
+        }
+      } catch (e) {
+        alert('เกิดข้อผิดพลาด: ' + e.message);
+      }
+    }
+  </script>
+</body>
+</html>
